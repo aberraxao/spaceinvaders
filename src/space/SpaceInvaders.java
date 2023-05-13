@@ -4,16 +4,15 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 
-import controllers.AiController;
 import controllers.GameController;
 import nn.SpaceInvadersGeneticAlgorithm;
-import nn.SpaceInvadersNeuralNetwork;
+import nn.AiController;
 
 public class SpaceInvaders extends JFrame {
 
 	private Board board;
 
-	private SpaceInvadersNeuralNetwork neuralNetwork;
+	private AiController neuralNetwork;
 
 	public SpaceInvaders() {
 		initUI();
@@ -47,7 +46,7 @@ public class SpaceInvaders extends JFrame {
 		EventQueue.invokeLater(() -> {
 
 			var ex = new SpaceInvaders();
-			ex.setController(new AiController(ex.getNeuralNetwork()));
+			ex.setController( (ex.neuralNetwork) );
 			ex.setSeed(seed);
 			ex.setVisible(true);
 		});
@@ -55,12 +54,12 @@ public class SpaceInvaders extends JFrame {
 
 	private void initializeNeuralNetwork() {
 		int inputDim = Commons.STATE_SIZE;
-		int hiddenDim = 100;
-		int outputDim = 4;
+		int hiddenDim = 25;
+		int outputDim = Commons.NUM_ACTIONS;
 
 		SpaceInvadersGeneticAlgorithm geneticAlgorithm = new SpaceInvadersGeneticAlgorithm(inputDim, hiddenDim, outputDim);
 		neuralNetwork = geneticAlgorithm.evolve(board);
-		board.setController(new AiController(neuralNetwork));
+		board.setController(new controllers.AiController(neuralNetwork));
 	}
 
 	public void setController(GameController controller) {
@@ -72,7 +71,7 @@ public class SpaceInvaders extends JFrame {
 
 	}
 
-	public SpaceInvadersNeuralNetwork getNeuralNetwork() {
+	public AiController getNeuralNetwork() {
 		return neuralNetwork;
 	}
 
