@@ -59,7 +59,7 @@ public class SpaceInvaders extends JFrame {
 
 		SpaceInvadersGeneticAlgorithm geneticAlgorithm = new SpaceInvadersGeneticAlgorithm(inputDim, hiddenDim, outputDim);
 		neuralNetwork = geneticAlgorithm.evolve(board);
-		board.setController(new controllers.AiController(neuralNetwork));
+		setController(neuralNetwork);
 	}
 
 	public void setController(GameController controller) {
@@ -68,11 +68,6 @@ public class SpaceInvaders extends JFrame {
 
 	public void setSeed(long seed) {
 		board.setSeed(seed);
-
-	}
-
-	public AiController getNeuralNetwork() {
-		return neuralNetwork;
 	}
 
 }
