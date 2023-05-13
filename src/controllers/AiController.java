@@ -1,18 +1,16 @@
 package controllers;
 
-import nn.SpaceInvadersNeuralNetwork;
-
 public class AiController implements GameController {
 
-	private SpaceInvadersNeuralNetwork neuralNetwork;
+	private nn.AiController neuralNetwork;
 
-	public AiController(SpaceInvadersNeuralNetwork neuralNetwork) {
+	public AiController(nn.AiController neuralNetwork) {
 		super();
 		this.neuralNetwork = neuralNetwork;
 	}
 
 	@Override
 	public double[] nextMove(double[] state) {
-		return neuralNetwork.predict(state);
+		return neuralNetwork.forward(state);
 	}
 }

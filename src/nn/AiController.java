@@ -1,8 +1,10 @@
 package nn;
 
+import controllers.GameController;
+
 import java.util.Random;
 
-public class SpaceInvadersNeuralNetwork {
+public class AiController implements GameController {
     private int inputDim;
     private int hiddenDim;
     private int outputDim;
@@ -11,7 +13,9 @@ public class SpaceInvadersNeuralNetwork {
     private double[][] outputWeights;
     private double[] outputBiases;
 
-    public SpaceInvadersNeuralNetwork(int inputDim, int hiddenDim, int outputDim) {
+    private double fitness;
+
+    public AiController(int inputDim, int hiddenDim, int outputDim) {
         this.inputDim = inputDim;
         this.hiddenDim = hiddenDim;
         this.outputDim = outputDim;
@@ -21,7 +25,7 @@ public class SpaceInvadersNeuralNetwork {
         this.outputBiases = new double[outputDim];
     }
 
-    public SpaceInvadersNeuralNetwork(int inputDim, int hiddenDim, int outputDim, double[] values) {
+    public AiController(int inputDim, int hiddenDim, int outputDim, double[] values) {
         this(inputDim, hiddenDim, outputDim);
         int offset = 0;
         for (int i = 0; i < inputDim; i++) {
@@ -43,37 +47,6 @@ public class SpaceInvadersNeuralNetwork {
         for (int i = 0; i < outputDim; i++) {
             outputBiases[i] = values[offset + i];
         }
-    }
-
-    public int getChromosomeSize() {
-        return inputWeights.length * inputWeights[0].length + hiddenBiases.length
-                + outputWeights.length * outputWeights[0].length + outputBiases.length;
-    }
-
-    public double[] getChromosome() {
-        double[] chromosome = new double[getChromosomeSize()];
-        int offset = 0;
-        for (int i = 0; i < inputDim; i++) {
-            for (int j = 0; j < hiddenDim; j++) {
-                chromosome[i * hiddenDim + j] = inputWeights[i][j];
-            }
-        }
-        offset = inputDim * hiddenDim;
-        for (int i = 0; i < hiddenDim; i++) {
-            chromosome[offset + i] = hiddenBiases[i];
-        }
-        offset += hiddenDim;
-        for (int i = 0; i < hiddenDim; i++) {
-            for (int j = 0; j < outputDim; j++) {
-                chromosome[offset + i * outputDim + j] = outputWeights[i][j];
-            }
-        }
-        offset += hiddenDim * outputDim;
-        for (int i = 0; i < outputDim; i++) {
-            chromosome[offset + i] = outputBiases[i];
-        }
-
-        return chromosome;
     }
 
     public void initializeWeights() {
@@ -152,11 +125,16 @@ public class SpaceInvadersNeuralNetwork {
         return output;
     }
 
-    public double[] predict(double[] input) {
-        return forward(input);
+    public double getFitness() {
+        return fitness;
     }
 
-    public double getFitness() {
-        return 1.0;
+    public void setFitness(double fitness) {
+        this.fitness = fitness;
+    }
+
+    @Override
+    public double[] nextMove(double[] currentState) {
+        return forward(currentState);
     }
 }
