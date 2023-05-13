@@ -5,7 +5,7 @@ import space.Board;
 import java.util.Random;
 
 public class SpaceInvadersGeneticAlgorithm {
-    private static final int POPULATION_SIZE = 100;
+    private static final int POPULATION_SIZE = 200;
     private static final double MUTATION_RATE = 0.1;
     private static final double CROSSOVER_RATE = 0.8;
     private static final int TOURNAMENT_SIZE = 5;
@@ -14,36 +14,36 @@ public class SpaceInvadersGeneticAlgorithm {
     private int inputDim;
     private int hiddenDim;
     private int outputDim;
-    private AiController[] population;
+    private SpaceInvadersNeuralNetwork[] population;
 
     public SpaceInvadersGeneticAlgorithm(int inputDim, int hiddenDim, int outputDim) {
         this.inputDim = inputDim;
         this.hiddenDim = hiddenDim;
         this.outputDim = outputDim;
-        this.population = new AiController[POPULATION_SIZE];
+        this.population = new SpaceInvadersNeuralNetwork[POPULATION_SIZE];
     }
 
     public void initializePopulation() {
         for (int i = 0; i < POPULATION_SIZE; i++) {
-            AiController network = new AiController(inputDim, hiddenDim, outputDim);
+            SpaceInvadersNeuralNetwork network = new SpaceInvadersNeuralNetwork(inputDim, hiddenDim, outputDim);
             network.initializeWeights();
             population[i] = network;
         }
     }
 
-    public AiController evolve(Board board) {
+    public SpaceInvadersNeuralNetwork evolve(Board board) {
         initializePopulation();
 
         for (int generation = 0; generation < MAX_GENERATIONS; generation++) {
             System.out.println("Generation: " + generation);
 
-            AiController[] newPopulation = new AiController[POPULATION_SIZE];
+            SpaceInvadersNeuralNetwork[] newPopulation = new SpaceInvadersNeuralNetwork[POPULATION_SIZE];
 
             for (int i = 0; i < POPULATION_SIZE; i++) {
-                AiController parent1 = selectParent();
-                AiController parent2 = selectParent();
+                SpaceInvadersNeuralNetwork parent1 = selectParent();
+                SpaceInvadersNeuralNetwork parent2 = selectParent();
 
-                AiController offspring = crossover(parent1, parent2);
+                SpaceInvadersNeuralNetwork offspring = crossover(parent1, parent2);
 
                 mutate(offspring);
 
@@ -60,25 +60,23 @@ public class SpaceInvadersGeneticAlgorithm {
         return getBestNetwork();
     }
 
-    private double evaluateFitness(AiController network, Board board) {
+    private double evaluateFitness(SpaceInvadersNeuralNetwork network, Board board) {
         // Simulate the game using the network and board
         Board simulator = new Board(network);
         simulator.setSeed(5);
         simulator.run();
 
-        // Calculate fitness based on game score or other metrics
         double score = simulator.getFitness();
-        // Other fitness calculations can be done here
 
         return score;
     }
 
-    private AiController selectParent() {
+    private SpaceInvadersNeuralNetwork selectParent() {
         Random random = new Random();
-        AiController bestNetwork = population[random.nextInt(POPULATION_SIZE)];
+        SpaceInvadersNeuralNetwork bestNetwork = population[random.nextInt(POPULATION_SIZE)];
 
         for (int i = 0; i < TOURNAMENT_SIZE; i++) {
-            AiController network = population[random.nextInt(POPULATION_SIZE)];
+            SpaceInvadersNeuralNetwork network = population[random.nextInt(POPULATION_SIZE)];
             if (network.getFitness() > bestNetwork.getFitness()) {
                 bestNetwork = network;
             }
@@ -87,8 +85,8 @@ public class SpaceInvadersGeneticAlgorithm {
         return bestNetwork;
     }
 
-    private AiController crossover(AiController parent1, AiController parent2) {
-        AiController offspring = new AiController(inputDim, hiddenDim, outputDim);
+    private SpaceInvadersNeuralNetwork crossover(SpaceInvadersNeuralNetwork parent1, SpaceInvadersNeuralNetwork parent2) {
+        SpaceInvadersNeuralNetwork offspring = new SpaceInvadersNeuralNetwork(inputDim, hiddenDim, outputDim);
 
         for (int i = 0; i < inputDim; i++) {
             for (int j = 0; j < hiddenDim; j++) {
@@ -126,7 +124,7 @@ public class SpaceInvadersGeneticAlgorithm {
         return offspring;
     }
 
-    private void mutate(AiController network) {
+    private void mutate(SpaceInvadersNeuralNetwork network) {
         Random random = new Random();
 
         for (int i = 0; i < inputDim; i++) {
@@ -156,8 +154,8 @@ public class SpaceInvadersGeneticAlgorithm {
     }
 
 
-    private AiController getBestNetwork() {
-        AiController bestNetwork = population[0];
+    private SpaceInvadersNeuralNetwork getBestNetwork() {
+        SpaceInvadersNeuralNetwork bestNetwork = population[0];
         double bestFitness = bestNetwork.getFitness();
 
         for (int i = 1; i < POPULATION_SIZE; i++) {

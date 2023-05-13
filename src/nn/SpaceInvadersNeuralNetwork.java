@@ -4,7 +4,7 @@ import controllers.GameController;
 
 import java.util.Random;
 
-public class AiController implements GameController {
+public class SpaceInvadersNeuralNetwork implements GameController {
     private int inputDim;
     private int hiddenDim;
     private int outputDim;
@@ -15,7 +15,7 @@ public class AiController implements GameController {
 
     private double fitness;
 
-    public AiController(int inputDim, int hiddenDim, int outputDim) {
+    public SpaceInvadersNeuralNetwork(int inputDim, int hiddenDim, int outputDim) {
         this.inputDim = inputDim;
         this.hiddenDim = hiddenDim;
         this.outputDim = outputDim;
@@ -23,30 +23,6 @@ public class AiController implements GameController {
         this.hiddenBiases = new double[hiddenDim];
         this.outputWeights = new double[hiddenDim][outputDim];
         this.outputBiases = new double[outputDim];
-    }
-
-    public AiController(int inputDim, int hiddenDim, int outputDim, double[] values) {
-        this(inputDim, hiddenDim, outputDim);
-        int offset = 0;
-        for (int i = 0; i < inputDim; i++) {
-            for (int j = 0; j < hiddenDim; j++) {
-                inputWeights[i][j] = values[i * hiddenDim + j];
-            }
-        }
-        offset = inputDim * hiddenDim;
-        for (int i = 0; i < hiddenDim; i++) {
-            hiddenBiases[i] = values[offset + i];
-        }
-        offset += hiddenDim;
-        for (int i = 0; i < hiddenDim; i++) {
-            for (int j = 0; j < outputDim; j++) {
-                outputWeights[i][j] = values[offset + i * outputDim + j];
-            }
-        }
-        offset += hiddenDim * outputDim;
-        for (int i = 0; i < outputDim; i++) {
-            outputBiases[i] = values[offset + i];
-        }
     }
 
     public void initializeWeights() {
