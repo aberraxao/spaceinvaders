@@ -14,18 +14,13 @@ public class AiFeedForwardController implements GameController, Comparable<AiFee
     private double[] hiddenBiases;
     private double[][] outputWeights;
     private double[] outputBiases;
-    private Random random;
-    private int seed;
     private double fitness;
 
-    public AiFeedForwardController(int seed) {
+    public AiFeedForwardController() {
         this.inputWeights = new double[this.getInputDim()][this.getHiddenDim()];
         this.hiddenBiases = new double[this.getHiddenDim()];
         this.outputWeights = new double[this.getHiddenDim()][this.getOutputDim()];
         this.outputBiases = new double[this.getOutputDim()];
-
-        this.seed = seed;
-        this.random = new Random(seed);
     }
 
     public int getInputDim() {
@@ -81,6 +76,8 @@ public class AiFeedForwardController implements GameController, Comparable<AiFee
     }
 
     public void initializeWeightsAndBiases() {
+        Random random = new Random();
+
         for (int i = 0; i < this.getInputDim(); i++)
             for (int j = 0; j < this.getHiddenDim(); j++)
                 setInputWeights(i, j, random.nextDouble() - 0.5);
@@ -94,7 +91,7 @@ public class AiFeedForwardController implements GameController, Comparable<AiFee
             setOutputBiases(i, random.nextDouble() - 0.5);
     }
 
-    public void calculateAndSetFitness() {
+    public void calculateAndSetFitness(int seed) {
         Board b = new Board(this);
         b.setSeed(seed);
         b.run();

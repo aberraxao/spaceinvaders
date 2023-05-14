@@ -10,26 +10,25 @@ import static main.PlayAiController.logger;
 
 public class AiGeneticEvolution {
     private static final int POPULATION_SIZE = 100;
-    private static final int MAX_GENERATIONS = 500;
+    private static final int MAX_GENERATIONS = 200;
     private static final double MUTATION_RATE = 0.1;
     private static final double CROSSOVER_RATE = 0.8;
-    private static final int TOURNAMENT_SIZE = 2;
+    private static final int TOURNAMENT_SIZE = 5;
+    private int seedBoard;
     private Random random;
-    private int seed;
     private AiFeedForwardController[] population = new AiFeedForwardController[POPULATION_SIZE];
     private AiFeedForwardController bestNetWork;
 
-    public AiGeneticEvolution(int seed) {
-        this.seed = seed;
-        this.random = new Random(seed);
+    public AiGeneticEvolution(int seedBoard) {
+        this.seedBoard = seedBoard;
         initializePopulation();
     }
 
     private void initializePopulation() {
         for (int i = 0; i < POPULATION_SIZE; i++) {
-            AiFeedForwardController network = new AiFeedForwardController(seed);
+            AiFeedForwardController network = new AiFeedForwardController();
             network.initializeWeightsAndBiases();
-            network.calculateAndSetFitness();
+            network.calculateAndSetFitness(seedBoard);
             population[i] = network;
         }
         Arrays.sort(population);
@@ -46,8 +45,8 @@ public class AiGeneticEvolution {
     public AiFeedForwardController train() {
 
         for (int generation = 0; generation < MAX_GENERATIONS; generation++) {
-
-            logger.log(Level.INFO, "------- Generation {0} -------", generation);
+            random = new Random();
+            logger.log(Level.INFO, "-> Generation {0} with random {1}", new Object[]{generation, random});
 
             AiFeedForwardController[] newPopulation = new AiFeedForwardController[POPULATION_SIZE];
             for (int pop = 0; pop < POPULATION_SIZE; pop++) {
@@ -55,7 +54,7 @@ public class AiGeneticEvolution {
                 AiFeedForwardController parent2 = selectParent(population);
                 AiFeedForwardController child = crossover(parent1, parent2);
                 mutate(child);
-                child.calculateAndSetFitness();
+                child.calculateAndSetFitness(seedBoard);
                 newPopulation[pop] = child;
                 updateBestNetwork(child);
             }
@@ -77,7 +76,7 @@ public class AiGeneticEvolution {
 
     private AiFeedForwardController crossover(AiFeedForwardController parent1, AiFeedForwardController parent2) {
 
-        AiFeedForwardController child = new AiFeedForwardController(seed);
+        AiFeedForwardController child = new AiFeedForwardController();
 
         crossoverInputWeights(child, parent1, parent2);
         crossoverHiddenBiasesAndOutputWeights(child, parent1, parent2);
