@@ -5,6 +5,9 @@ import space.Board;
 import space.Commons;
 
 import java.util.Random;
+import java.util.logging.Level;
+
+import static main.PlayAiController.logger;
 
 public class AiFeedForwardController implements GameController, Comparable<AiFeedForwardController> {
     private static final int INPUT_DIM = Commons.STATE_SIZE;
@@ -77,6 +80,7 @@ public class AiFeedForwardController implements GameController, Comparable<AiFee
 
     public void initializeWeightsAndBiases() {
         Random random = new Random();
+        logger.log(Level.INFO, "-> Feed Forward weights generated with random {0}", random);
 
         for (int i = 0; i < this.getInputDim(); i++)
             for (int j = 0; j < this.getHiddenDim(); j++)
