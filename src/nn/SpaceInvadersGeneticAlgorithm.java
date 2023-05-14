@@ -1,7 +1,5 @@
 package nn;
 
-import space.Board;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,6 +31,7 @@ public class SpaceInvadersGeneticAlgorithm  {
         for (int i = 0; i < POPULATION_SIZE; i++) {
             AiController network = new AiController(inputDim, hiddenDim, outputDim, seed);
             network.initializeWeights();
+            network.calculateFitness();
             population[i] = network;
         }
     }
@@ -47,14 +46,6 @@ public class SpaceInvadersGeneticAlgorithm  {
             // Sort the population by fitness
             Arrays.sort(population);
 
-            // Print the best solution of this generation
-            System.out.println("Generation " + generation + ": best solution -> " + population[0] + " with fitness " + population[0].getFitness());
-
-            // Check if we have found a solution
-            // TODO?
-            //if (population[0].getFitness() == 0) {
-            //    break;
-            //}
             // Create the next generation
             AiController[] newPopulation = new AiController[POPULATION_SIZE];
             for (int pop = 0; pop < POPULATION_SIZE; pop++) {
@@ -65,11 +56,16 @@ public class SpaceInvadersGeneticAlgorithm  {
                 AiController child = crossover(parent1, parent2);
                 // Mutate the child
                 mutate(child);
+                // Calculates the fitness
+                child.calculateFitness();
                 // Add the child to the new population
                 newPopulation[pop] = child;
             }
             // Replace the old population with the new population
             population = newPopulation;
+
+            // Print the best solution of this generation
+            System.out.println("Generation " + generation + ": best solution -> " + population[0] + " with fitness " + population[0].getFitness());
         }
         // Print the best solution we found
         Arrays.sort(population);
@@ -159,8 +155,6 @@ public class SpaceInvadersGeneticAlgorithm  {
                 individual.getOutputBiases()[i] += random.nextGaussian() * 0.1;
             }
         }
-
-        individual.calculateFitness();
     }
 
 }

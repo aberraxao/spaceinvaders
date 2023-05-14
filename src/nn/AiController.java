@@ -27,8 +27,6 @@ public class AiController implements GameController, Comparable<AiController> {
         this.outputBiases = new double[this.outputDim];
 
         this.seed = seed;
-
-        calculateFitness();
     }
 
     public int getInputDim() {
@@ -62,6 +60,9 @@ public class AiController implements GameController, Comparable<AiController> {
     public double getFitness(){
         return fitness;
     }
+    public void setFitness(double fitness){
+        this.fitness = fitness;
+    }
 
     public void initializeWeights() {
         // Randomly initialize weights and biases
@@ -80,19 +81,16 @@ public class AiController implements GameController, Comparable<AiController> {
         for (int i = 0; i < this.getOutputDim(); i++) {
             outputBiases[i] = random.nextDouble() - 0.5;
         }
-
-        calculateFitness();
     }
 
     public void calculateFitness() {
         Board b = new Board(this);
         b.setSeed(seed);
         b.run();
-        fitness = b.getFitness();
+        this.setFitness(b.getFitness());
     }
 
     public double[] forward(double[] input) {
-        // TODO: check with Diogo
         // Compute output given input
         double[] hidden = new double[this.getHiddenDim()];
         for (int i = 0; i < this.getHiddenDim(); i++) {
