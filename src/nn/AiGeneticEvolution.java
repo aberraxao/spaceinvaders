@@ -34,12 +34,12 @@ public class AiGeneticEvolution {
         }
         Arrays.sort(population);
         bestNetWork = population[0];
-        logger.log(Level.INFO, "First best network found {0} with fitness {1}", new Object[]{bestNetWork, bestNetWork.getFitness()});
+        logger.log(Level.INFO, "First best network: {0} -> fitness {1}", new Object[]{bestNetWork, bestNetWork.getFitness()});
     }
     private void updateBestNetwork(AiFeedForwardController currentNetwork) {
         if (currentNetwork.compareTo(bestNetWork) < 0) {
             bestNetWork = currentNetwork;
-            logger.log(Level.INFO, "New best network found {0} with fitness {1}", new Object[]{bestNetWork, bestNetWork.getFitness()});
+            logger.log(Level.INFO, "New best network: {0} -> fitness {1}", new Object[]{bestNetWork, bestNetWork.getFitness()});
         }
     }
 
@@ -62,6 +62,7 @@ public class AiGeneticEvolution {
             population = newPopulation;
         }
 
+        logger.log(Level.INFO, "Global best network: {0} -> fitness {1}", new Object[]{bestNetWork, bestNetWork.getFitness()});
         return bestNetWork;
     }
 
