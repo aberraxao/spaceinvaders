@@ -1,5 +1,6 @@
 package main;
 
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -12,8 +13,10 @@ public class PlayAiController {
 
     public static void main(String[] args) {
 
-        int seed = 5;
+        Random random = new Random();
+        int seed = random.nextInt();
         logger.log(Level.INFO, "Seed: {0}", seed);
+
         AiGeneticEvolution nn = new AiGeneticEvolution(seed);
         SpaceInvaders.showControllerPlaying(nn.train(), seed);
     }
