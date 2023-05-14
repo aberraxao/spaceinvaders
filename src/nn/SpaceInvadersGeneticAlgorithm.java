@@ -2,173 +2,164 @@ package nn;
 
 import space.Board;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Random;
 
-public class SpaceInvadersGeneticAlgorithm {
+public class SpaceInvadersGeneticAlgorithm  {
     private static final int POPULATION_SIZE = 100;
+    private static final int MAX_GENERATIONS = 100;
     private static final double MUTATION_RATE = 0.1;
     private static final double CROSSOVER_RATE = 0.8;
-    private static final int TOURNAMENT_SIZE = 5;
-    private static final int MAX_GENERATIONS = 100;
+    private static final int TOURNAMENT_SIZE = 2;
+    private static Random random = new Random();
 
     private int inputDim;
     private int hiddenDim;
     private int outputDim;
+    private int seed;
     private AiController[] population;
 
-    public SpaceInvadersGeneticAlgorithm(int inputDim, int hiddenDim, int outputDim) {
+    public SpaceInvadersGeneticAlgorithm(int inputDim, int hiddenDim, int outputDim, int seed) {
         this.inputDim = inputDim;
         this.hiddenDim = hiddenDim;
         this.outputDim = outputDim;
         this.population = new AiController[POPULATION_SIZE];
+        this.seed = seed;
     }
 
-    public void initializePopulation() {
+    private void initializePopulation(){
         for (int i = 0; i < POPULATION_SIZE; i++) {
-            AiController network = new AiController(inputDim, hiddenDim, outputDim);
+            AiController network = new AiController(inputDim, hiddenDim, outputDim, seed);
             network.initializeWeights();
             population[i] = network;
         }
     }
 
-    public AiController evolve(Board board) {
+    public AiController train() {
+
         initializePopulation();
 
+        // Evolve the population for a fixed number of generations
         for (int generation = 0; generation < MAX_GENERATIONS; generation++) {
-            System.out.println("Generation: " + generation);
 
+            // Sort the population by fitness
+            Arrays.sort(population);
+
+            // Print the best solution of this generation
+            System.out.println("Generation " + generation + ": best solution -> " + population[0] + " with fitness " + population[0].getFitness());
+
+            // Check if we have found a solution
+            // TODO?
+            //if (population[0].getFitness() == 0) {
+            //    break;
+            //}
+            // Create the next generation
             AiController[] newPopulation = new AiController[POPULATION_SIZE];
-
-            for (int i = 0; i < POPULATION_SIZE; i++) {
-                AiController parent1 = selectParent();
-                AiController parent2 = selectParent();
-
-                AiController offspring = crossover(parent1, parent2);
-
-                mutate(offspring);
-
-                // Evaluate the network's performance on the game board
-                double fitness = evaluateFitness(offspring, board);
-                offspring.setFitness(fitness);
-
-                newPopulation[i] = offspring;
+            for (int pop = 0; pop < POPULATION_SIZE; pop++) {
+                // Select two parents from the population
+                AiController parent1 = selectParent(population);
+                AiController parent2 = selectParent(population);
+                // Crossover the parents to create a new child
+                AiController child = crossover(parent1, parent2);
+                // Mutate the child
+                mutate(child);
+                // Add the child to the new population
+                newPopulation[pop] = child;
             }
-
+            // Replace the old population with the new population
             population = newPopulation;
         }
+        // Print the best solution we found
+        Arrays.sort(population);
+        System.out.println("Best solution found: " + population[0]);
 
-        return getBestNetwork();
+        return population[0];
     }
 
-    private double evaluateFitness(AiController network, Board board) {
-        // Simulate the game using the network and board
-        Board simulator = new Board(network);
-        simulator.setSeed(5);
-        simulator.run();
-
-        // Calculate fitness based on game score or other metrics
-        double score = simulator.getFitness();
-        // Other fitness calculations can be done here
-
-        return score;
-    }
-
-    private AiController selectParent() {
-        Random random = new Random();
-        AiController bestNetwork = population[random.nextInt(POPULATION_SIZE)];
-
-        for (int i = 0; i < TOURNAMENT_SIZE; i++) {
-            AiController network = population[random.nextInt(POPULATION_SIZE)];
-            if (network.getFitness() > bestNetwork.getFitness()) {
-                bestNetwork = network;
-            }
+    private AiController selectParent(AiController[] population) {
+        ArrayList<AiController> tournament = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            tournament.add(population[random.nextInt(POPULATION_SIZE)]);
         }
-
-        return bestNetwork;
+        Collections.sort(tournament);
+        return tournament.get(0);
     }
 
     private AiController crossover(AiController parent1, AiController parent2) {
-        AiController offspring = new AiController(inputDim, hiddenDim, outputDim);
+        // Crossover two parents to create a new child
+        AiController child = new AiController(inputDim, hiddenDim, outputDim, seed);
 
-        for (int i = 0; i < inputDim; i++) {
-            for (int j = 0; j < hiddenDim; j++) {
-                if (Math.random() <= CROSSOVER_RATE) {
-                    offspring.getInputWeights()[i][j] = parent1.getInputWeights()[i][j];
+        // Crossover the input weights
+        for (int i = 0; i < child.getInputDim(); i++) {
+            for (int j = 0; j < child.getHiddenDim(); j++) {
+                if (random.nextDouble() < CROSSOVER_RATE) {
+                    child.getInputWeights()[i][j] = parent1.getInputWeights()[i][j];
                 } else {
-                    offspring.getInputWeights()[i][j] = parent2.getInputWeights()[i][j];
+                    child.getInputWeights()[i][j] = parent2.getInputWeights()[i][j];
                 }
             }
         }
 
-        for (int i = 0; i < hiddenDim; i++) {
-            if (Math.random() <= CROSSOVER_RATE) {
-                offspring.getHiddenBiases()[i] = parent1.getHiddenBiases()[i];
+        // Crossover the hidden biases and the output weights
+        for (int i = 0; i < child.getHiddenDim(); i++) {
+            if (random.nextDouble() < CROSSOVER_RATE) {
+                child.getHiddenBiases()[i] = parent1.getHiddenBiases()[i];
             } else {
-                offspring.getHiddenBiases()[i] = parent2.getHiddenBiases()[i];
+                child.getHiddenBiases()[i] = parent2.getHiddenBiases()[i];
             }
-            for (int j = 0; j < outputDim; j++) {
-                if (Math.random() <= CROSSOVER_RATE) {
-                    offspring.getOutputWeights()[i][j] = parent1.getOutputWeights()[i][j];
+            for (int j = 0; j < child.getOutputDim(); j++) {
+                if (random.nextDouble() < CROSSOVER_RATE) {
+                    child.getOutputWeights()[i][j] = parent1.getOutputWeights()[i][j];
                 } else {
-                    offspring.getOutputWeights()[i][j] = parent2.getOutputWeights()[i][j];
+                    child.getOutputWeights()[i][j] = parent2.getOutputWeights()[i][j];
                 }
             }
         }
 
-        for (int i = 0; i < outputDim; i++) {
-            if (Math.random() <= CROSSOVER_RATE) {
-                offspring.getOutputBiases()[i] = parent1.getOutputBiases()[i];
+        // Crossover the output biases
+        for (int i = 0; i < child.getOutputDim(); i++) {
+            if (random.nextDouble() < CROSSOVER_RATE) {
+                child.getOutputBiases()[i]= parent1.getOutputBiases()[i];
             } else {
-                offspring.getOutputBiases()[i] = parent2.getOutputBiases()[i];
+                child.getOutputBiases()[i]= parent2.getOutputBiases()[i];
             }
         }
 
-        return offspring;
+        return child;
     }
 
-    private void mutate(AiController network) {
-        Random random = new Random();
+    private void mutate(AiController individual) {
 
-        for (int i = 0; i < inputDim; i++) {
-            for (int j = 0; j < hiddenDim; j++) {
-                if (Math.random() <= MUTATION_RATE) {
-                    network.getInputWeights()[i][j] += random.nextGaussian() * 0.1;
+        // Mutate the input weights
+        for (int i = 0; i < individual.getInputDim(); i++) {
+            for (int j = 0; j < individual.getHiddenDim(); j++) {
+                if (random.nextDouble() < MUTATION_RATE) {
+                    individual.getInputWeights()[i][j] += random.nextGaussian() * 0.1;
                 }
             }
         }
 
-        for (int i = 0; i < hiddenDim; i++) {
-            if (Math.random() <= MUTATION_RATE) {
-                network.getHiddenBiases()[i] += random.nextGaussian() * 0.1;
+        // Mutate the hidden biases and output weights
+        for (int i = 0; i < individual.getHiddenDim(); i++) {
+            if (random.nextDouble() < MUTATION_RATE) {
+                individual.getHiddenBiases()[i] += random.nextGaussian() * 0.1;
             }
-            for (int j = 0; j < outputDim; j++) {
-                if (Math.random() <= MUTATION_RATE) {
-                    network.getOutputWeights()[i][j] += random.nextGaussian() * 0.1;
+            for (int j = 0; j < individual.getOutputDim(); j++) {
+                if (random.nextDouble() < MUTATION_RATE) {
+                    individual.getOutputWeights()[i][j] += random.nextGaussian() * 0.1;
                 }
             }
         }
 
-        for (int i = 0; i < outputDim; i++) {
-            if (Math.random() <= MUTATION_RATE) {
-                network.getOutputBiases()[i] += random.nextGaussian() * 0.1;
+        // Mutate the output biases
+        for (int i = 0; i < individual.getOutputDim(); i++) {
+            if (random.nextDouble() < MUTATION_RATE) {
+                individual.getOutputBiases()[i] += random.nextGaussian() * 0.1;
             }
         }
     }
 
-
-    private AiController getBestNetwork() {
-        AiController bestNetwork = population[0];
-        double bestFitness = bestNetwork.getFitness();
-
-        for (int i = 1; i < POPULATION_SIZE; i++) {
-            double fitness = population[i].getFitness();
-            if (fitness > bestFitness) {
-                bestFitness = fitness;
-                bestNetwork = population[i];
-            }
-        }
-
-        return bestNetwork;
-    }
 }
 

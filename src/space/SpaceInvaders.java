@@ -16,7 +16,6 @@ public class SpaceInvaders extends JFrame {
 
 	public SpaceInvaders() {
 		initUI();
-		initializeNeuralNetwork();
 	}
 
 	private void initUI() {
@@ -40,26 +39,6 @@ public class SpaceInvaders extends JFrame {
 			ex.setSeed(seed);
 			ex.setVisible(true);
 		});
-	}
-
-	public static void showAiPlaying(long seed) {
-		EventQueue.invokeLater(() -> {
-
-			var ex = new SpaceInvaders();
-			ex.setController( (ex.neuralNetwork) );
-			ex.setSeed(seed);
-			ex.setVisible(true);
-		});
-	}
-
-	private void initializeNeuralNetwork() {
-		int inputDim = Commons.STATE_SIZE;
-		int hiddenDim = 25;
-		int outputDim = Commons.NUM_ACTIONS;
-
-		SpaceInvadersGeneticAlgorithm geneticAlgorithm = new SpaceInvadersGeneticAlgorithm(inputDim, hiddenDim, outputDim);
-		neuralNetwork = geneticAlgorithm.evolve(board);
-		setController(neuralNetwork);
 	}
 
 	public void setController(GameController controller) {
