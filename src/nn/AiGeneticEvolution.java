@@ -17,6 +17,7 @@ public class AiGeneticEvolution {
     private Random random;
     private int seed;
     private AiFeedForwardController[] population = new AiFeedForwardController[POPULATION_SIZE];
+    private AiFeedForwardController bestNetWork;
 
     public AiGeneticEvolution(int seed) {
         this.seed = seed;
@@ -27,44 +28,41 @@ public class AiGeneticEvolution {
     private void initializePopulation() {
         for (int i = 0; i < POPULATION_SIZE; i++) {
             AiFeedForwardController network = new AiFeedForwardController(seed);
-            network.initializeWeights();
-            network.calculateFitness();
+            network.initializeWeightsAndBiases();
+            network.calculateAndSetFitness();
             population[i] = network;
+        }
+        Arrays.sort(population);
+        bestNetWork = population[0];
+        logger.log(Level.INFO, "First best network found {0} with fitness {1}", new Object[]{bestNetWork, bestNetWork.getFitness()});
+    }
+    private void updateBestNetwork(AiFeedForwardController currentNetwork) {
+        if (currentNetwork.compareTo(bestNetWork) < 0) {
+            bestNetWork = currentNetwork;
+            logger.log(Level.INFO, "New best network found {0} with fitness {1}", new Object[]{bestNetWork, bestNetWork.getFitness()});
         }
     }
 
     public AiFeedForwardController train() {
 
-        // Evolve the population for a fixed number of generations
         for (int generation = 0; generation < MAX_GENERATIONS; generation++) {
 
             logger.log(Level.INFO, "------- Generation {0} -------", generation);
 
-            // Create the next generation
             AiFeedForwardController[] newPopulation = new AiFeedForwardController[POPULATION_SIZE];
             for (int pop = 0; pop < POPULATION_SIZE; pop++) {
-                // Select two parents from the population
                 AiFeedForwardController parent1 = selectParent(population);
                 AiFeedForwardController parent2 = selectParent(population);
-                // Crossover the parents to create a new child
                 AiFeedForwardController child = crossover(parent1, parent2);
-                // Mutate the child
                 mutate(child);
-                // Calculates the fitness of the child
-                child.calculateFitness();
-                // Add the child to the new population
+                child.calculateAndSetFitness();
                 newPopulation[pop] = child;
-                logger.log(Level.INFO, "Child {0} fitness: {1}", new Object[]{child, child.getFitness()});
-
+                updateBestNetwork(child);
             }
-            // Replace the old population with the new population
             population = newPopulation;
         }
 
-        Arrays.sort(population);
-        logger.log(Level.INFO, "Best solution found: {0} with fitness {1}", new Object[]{population[0], population[0].getFitness()});
-
-        return population[0];
+        return bestNetWork;
     }
 
     private AiFeedForwardController selectParent(AiFeedForwardController[] population) {
