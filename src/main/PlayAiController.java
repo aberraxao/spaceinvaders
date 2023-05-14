@@ -1,18 +1,20 @@
 package main;
 
-import nn.SpaceInvadersGeneticAlgorithm;
-import space.Commons;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import nn.AiGeneticEvolution;
 import space.SpaceInvaders;
 
 public class PlayAiController {
-	public static void main(String[] args) {
-		int inputDim = Commons.STATE_SIZE;
-		int hiddenDim = 25;
-		int outputDim = Commons.NUM_ACTIONS;
-		int seed = 5;
 
-		SpaceInvadersGeneticAlgorithm geneticAlgorithm = new SpaceInvadersGeneticAlgorithm(inputDim, hiddenDim, outputDim, seed);
+    public static final Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-		SpaceInvaders.showControllerPlaying(geneticAlgorithm.train(),seed);
-	}
+    public static void main(String[] args) {
+
+        int seed = 5;
+        logger.log(Level.INFO, "Seed: {0}", seed);
+        AiGeneticEvolution nn = new AiGeneticEvolution(seed);
+        SpaceInvaders.showControllerPlaying(nn.train(), seed);
+    }
 }
