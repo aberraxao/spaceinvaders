@@ -10,7 +10,7 @@ public class SpaceInvadersGeneticAlgorithm  {
     private static final int MAX_GENERATIONS = 100;
     private static final double MUTATION_RATE = 0.1;
     private static final double CROSSOVER_RATE = 0.8;
-    private static final int TOURNAMENT_SIZE = 5;
+    private static final int TOURNAMENT_SIZE = 2;
     private static Random random = new Random();
 
     private int inputDim;
@@ -43,8 +43,8 @@ public class SpaceInvadersGeneticAlgorithm  {
         // Evolve the population for a fixed number of generations
         for (int generation = 0; generation < MAX_GENERATIONS; generation++) {
 
-            // Sort the population by fitness
-            Arrays.sort(population);
+            // Print all solutions of this generation
+            System.out.println("------- Generation " + generation + " -------");
 
             // Create the next generation
             AiController[] newPopulation = new AiController[POPULATION_SIZE];
@@ -56,18 +56,18 @@ public class SpaceInvadersGeneticAlgorithm  {
                 AiController child = crossover(parent1, parent2);
                 // Mutate the child
                 mutate(child);
-                // Calculates the fitness
+                // Calculates the fitness of the child
                 child.calculateFitness();
                 // Add the child to the new population
                 newPopulation[pop] = child;
+                // Prints the child fitness
+                System.out.println("Child " + child + " -> fitness " + child.getFitness());
+
             }
             // Replace the old population with the new population
             population = newPopulation;
-
-            // Print the best solution of this generation
-            System.out.println("Generation " + generation + ": best solution -> " + population[0] + " with fitness " + population[0].getFitness());
         }
-        // Print the best solution we found
+        // Print the best solution we found in the last generation
         Arrays.sort(population);
         System.out.println("Best solution found: " + population[0] + " with fitness " + population[0].getFitness());
 
