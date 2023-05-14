@@ -10,7 +10,7 @@ import static main.PlayAiController.logger;
 
 public class AiGeneticEvolution {
     private static final int POPULATION_SIZE = 100;
-    private static final int MAX_GENERATIONS = 200;
+    private static final int MAX_GENERATIONS = 1000;
     private static final double MUTATION_RATE = 0.1;
     private static final double CROSSOVER_RATE = 0.8;
     private static final int TOURNAMENT_SIZE = 5;
@@ -35,6 +35,7 @@ public class AiGeneticEvolution {
         bestNetWork = population[0];
         logger.log(Level.INFO, "First best network: {0} -> fitness {1}", new Object[]{bestNetWork, bestNetWork.getFitness()});
     }
+
     private void updateBestNetwork(AiFeedForwardController currentNetwork) {
         if (currentNetwork.compareTo(bestNetWork) < 0) {
             bestNetWork = currentNetwork;
@@ -99,8 +100,7 @@ public class AiGeneticEvolution {
             if (random.nextDouble() < CROSSOVER_RATE) child.setHiddenBiases(i, parent1.getHiddenBiases(i));
             else child.setHiddenBiases(i, parent2.getHiddenBiases(i));
             for (int j = 0; j < child.getOutputDim(); j++) {
-                if (random.nextDouble() < CROSSOVER_RATE)
-                    child.setOutputWeights(i, j, parent1.getOutputWeights(i, j));
+                if (random.nextDouble() < CROSSOVER_RATE) child.setOutputWeights(i, j, parent1.getOutputWeights(i, j));
                 else child.setOutputWeights(i, j, parent2.getOutputWeights(i, j));
             }
         }
@@ -142,4 +142,3 @@ public class AiGeneticEvolution {
                 child.setOutputBiases(i, child.getOutputBiases(i) + random.nextGaussian() * 0.1);
     }
 }
-
