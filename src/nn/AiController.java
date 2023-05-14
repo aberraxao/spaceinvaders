@@ -31,32 +31,6 @@ public class AiController implements GameController, Comparable<AiController> {
         calculateFitness();
     }
 
-    public AiController(int inputDim, int hiddenDim, int outputDim, double[] values, int seed) {
-        this(inputDim, hiddenDim, outputDim, seed);
-        int offset;
-        for (int i = 0; i < inputDim; i++) {
-            for (int j = 0; j < hiddenDim; j++) {
-                inputWeights[i][j] = values[i * hiddenDim + j];
-            }
-        }
-        offset = inputDim * hiddenDim;
-        for (int i = 0; i < hiddenDim; i++) {
-            hiddenBiases[i] = values[offset + i];
-        }
-        offset += hiddenDim;
-        for (int i = 0; i < hiddenDim; i++) {
-            for (int j = 0; j < outputDim; j++) {
-                outputWeights[i][j] = values[offset + i * outputDim + j];
-            }
-        }
-        offset += hiddenDim * outputDim;
-        for (int i = 0; i < outputDim; i++) {
-            outputBiases[i] = values[offset + i];
-        }
-
-        calculateFitness();
-    }
-
     public int getInputDim() {
         return inputDim;
     }
@@ -106,27 +80,15 @@ public class AiController implements GameController, Comparable<AiController> {
         for (int i = 0; i < this.getOutputDim(); i++) {
             outputBiases[i] = random.nextDouble() - 0.5;
         }
+
+        calculateFitness();
     }
 
-    private void calculateFitness() {
+    public void calculateFitness() {
         Board b = new Board(this);
         b.setSeed(seed);
         b.run();
         fitness = b.getFitness();
-/*
-        private double evaluateFitness(AiController network, Board board) {
-            // Simulate the game using the network and board
-            Board simulator = new Board(network);
-            simulator.setSeed(5);
-            simulator.run();
-
-            // Calculate fitness based on game score or other metrics
-            double score = simulator.getFitness();
-            // Other fitness calculations can be done here
-
-            return score;
-        }
-*/
     }
 
     public double[] forward(double[] input) {
@@ -156,6 +118,7 @@ public class AiController implements GameController, Comparable<AiController> {
         for (int i = 0; i < this.getOutputDim(); i++) {
             output[i] /= sum;
         }
+
         return output;
     }
 

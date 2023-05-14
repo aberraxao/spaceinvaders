@@ -12,7 +12,7 @@ public class SpaceInvadersGeneticAlgorithm  {
     private static final int MAX_GENERATIONS = 100;
     private static final double MUTATION_RATE = 0.1;
     private static final double CROSSOVER_RATE = 0.8;
-    private static final int TOURNAMENT_SIZE = 2;
+    private static final int TOURNAMENT_SIZE = 5;
     private static Random random = new Random();
 
     private int inputDim;
@@ -73,14 +73,14 @@ public class SpaceInvadersGeneticAlgorithm  {
         }
         // Print the best solution we found
         Arrays.sort(population);
-        System.out.println("Best solution found: " + population[0]);
+        System.out.println("Best solution found: " + population[0] + " with fitness " + population[0].getFitness());
 
         return population[0];
     }
 
     private AiController selectParent(AiController[] population) {
         ArrayList<AiController> tournament = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < TOURNAMENT_SIZE; i++) {
             tournament.add(population[random.nextInt(POPULATION_SIZE)]);
         }
         Collections.sort(tournament);
@@ -159,6 +159,8 @@ public class SpaceInvadersGeneticAlgorithm  {
                 individual.getOutputBiases()[i] += random.nextGaussian() * 0.1;
             }
         }
+
+        individual.calculateFitness();
     }
 
 }
