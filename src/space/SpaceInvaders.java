@@ -5,69 +5,45 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 
 import controllers.GameController;
-import nn.SpaceInvadersGeneticAlgorithm;
-import nn.AiController;
 
 public class SpaceInvaders extends JFrame {
 
-	private Board board;
+    private Board board;
 
-	private AiController neuralNetwork;
+    public SpaceInvaders() {
 
-	public SpaceInvaders() {
-		initUI();
-		initializeNeuralNetwork();
-	}
+        initUI();
+    }
 
-	private void initUI() {
-		board = new Board();
-		add(board);
+    private void initUI() {
+        board = new Board();
+        add(board);
 
-		setTitle("Space Invaders");
-		setSize(Commons.BOARD_WIDTH, Commons.BOARD_HEIGHT);
+        setTitle("Space Invaders");
+        setSize(Commons.BOARD_WIDTH, Commons.BOARD_HEIGHT);
 
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setResizable(false);
-		setLocationRelativeTo(null);
-	}
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setResizable(false);
+        setLocationRelativeTo(null);
+    }
 
 
-	public static void showControllerPlaying(GameController controller, long seed) {
-		EventQueue.invokeLater(() -> {
+    public static void showControllerPlaying(GameController controller, long seed) {
+        EventQueue.invokeLater(() -> {
 
-			var ex = new SpaceInvaders();
-			ex.setController(controller);
-			ex.setSeed(seed);
-			ex.setVisible(true);
-		});
-	}
+            var ex = new SpaceInvaders();
+            ex.setController(controller);
+            ex.setSeed(seed);
+            ex.setVisible(true);
+        });
+    }
 
-	public static void showAiPlaying(long seed) {
-		EventQueue.invokeLater(() -> {
+    public void setController(GameController controller) {
+        board.setController(controller);
+    }
 
-			var ex = new SpaceInvaders();
-			ex.setController( (ex.neuralNetwork) );
-			ex.setSeed(seed);
-			ex.setVisible(true);
-		});
-	}
-
-	private void initializeNeuralNetwork() {
-		int inputDim = Commons.STATE_SIZE;
-		int hiddenDim = 25;
-		int outputDim = Commons.NUM_ACTIONS;
-
-		SpaceInvadersGeneticAlgorithm geneticAlgorithm = new SpaceInvadersGeneticAlgorithm(inputDim, hiddenDim, outputDim);
-		neuralNetwork = geneticAlgorithm.evolve(board);
-		setController(neuralNetwork);
-	}
-
-	public void setController(GameController controller) {
-		board.setController(controller);
-	}
-
-	public void setSeed(long seed) {
-		board.setSeed(seed);
-	}
+    public void setSeed(long seed) {
+        board.setSeed(seed);
+    }
 
 }
